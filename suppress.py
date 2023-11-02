@@ -1,27 +1,24 @@
 """A simple wrapper around contextlib.suppress"""
 
+import asyncio
 import contextlib
 from functools import wraps
 
 
-__version__ = "0.1.1"
+__version__ = "0.2.0"
 
 
 def suppress(*exceptions):
     def wrap(func):
-        @wraps(func)
-        def inner(*args, **kwargs):
-            with contextlib.suppress(exceptions):
-                return func(*args, **kwargs)
-        return inner
-    return wrap
-
-
-def async_suppress(*exceptions):
-    def wrap(func):
-        @wraps(func)
-        async def inner(*args, **kwargs):
-            with contextlib.suppress(exceptions):
-                return await func(*args, **kwargs)
+        if asyncio.iscoroutinefunction(func):
+            @wraps(func)
+            async def inner(*args, **kwargs):
+                with contextlib.suppress(exceptions):
+                    return await func(*args, **kwargs)
+        else:
+            @wraps(func)
+            def inner(*args, **kwargs):
+                with contextlib.suppress(exceptions):
+                    return func(*args, **kwargs)
         return inner
     return wrap
