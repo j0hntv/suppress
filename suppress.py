@@ -22,3 +22,7 @@ def suppress(*exceptions):
                     return func(*args, **kwargs)
         return inner
     return wrap
+
+
+# for backward compatibility
+async_suppress = suppress
